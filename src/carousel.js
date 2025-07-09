@@ -146,7 +146,6 @@ function setCircles(selectedCircle) {
   const circles = document.getElementsByClassName("circle");
   for (let c = 0; c < circles.length; c++) {
     circles[c].style.backgroundColor = "rgba(0,0,0,0.0)";
-    //circles[c].removeEventListener("mouseout", setReturnColor);
     circles[c].removeEventListener("mouseout", setReturnWhite);
     circles[c].addEventListener("mouseout", setReturnClear);
   }
