@@ -1,25 +1,10 @@
 export function carousel(images) {
-  const setHoverBlack = (e) => {
-    e.target.style.backgroundColor = "rgba(0,0,0,0.5)";
-  };
-
-  const setHoverWhite = (e) => {
-    e.target.style.backgroundColor = "rgba(255,255,255,0.5)";
-  };
-
-  const setReturnClear = (e) => {
-    e.target.style.backgroundColor = "rgba(0,0,0,0)";
-  };
-
-  const setReturnWhite = (e) => {
-    e.target.style.backgroundColor = "rgb(255,255,255)";
-  };
-
   let scrollPos = 0;
   const carouselDOM = document.getElementById("carousel");
   carouselDOM.style.position = "relative";
   carouselDOM.style.width = "800px";
   carouselDOM.style.height = "500px";
+
   const container = document.createElement("div");
   container.style.overflowX = "hidden";
   container.style.width = "800px";
@@ -72,6 +57,7 @@ export function carousel(images) {
 
   for (let n = 0; n < images.length; n++) {
     let circle = document.createElement("div");
+    circle.id = n;
     circle.className = "circle";
     if (n == 0) {
       circle.style.backgroundColor = "#FFFFFF";
@@ -81,39 +67,47 @@ export function carousel(images) {
     circle.style.height = "10px";
     circle.style.borderRadius = "50%";
     circle.style.textAlign = "center";
+
     circle.addEventListener("click", (e) => {
-      const circles = document.getElementsByClassName("circle");
-      for (let c = 0; c < circles.length; c++) {
-        circles[c].style.backgroundColor = "rgba(0,0,0,0.0)";
-        circles[c].removeEventListener("mouseout", setReturnColor);
-        if (n != c) {
-          circles[c].addEventListener("mouseout", setReturnClear);
-        }
-      }
-      e.target.style.backgroundColor = "#FFFFFF";
-      e.target.addEventListener("mouseout", setReturnWhite);
+      setCircles(e.target);
       scrollPos = n * 800;
       container.scroll(scrollPos, 0);
     });
-    let setReturnColor = setReturnClear;
-    console.log(circle.style.backgroundColor);
+
     if (circle.style.backgroundColor == "rgb(255, 255, 255)") {
-      console.log("white");
-      setReturnColor = setReturnWhite;
+      circle = addHover(circle, setHoverWhite, setReturnWhite);
+    } else {
+      circle = addHover(circle, setHoverWhite, setReturnClear);
     }
-    console.log(setReturnColor);
-    circle = addHover(circle, setHoverWhite, setReturnColor);
     nav.appendChild(circle);
   }
 
   carouselDOM.appendChild(left);
   carouselDOM.appendChild(right);
   carouselDOM.appendChild(nav);
+
+  setInterval(() => {
+    scrollPos = nextPrev(scrollPos, container, 1);
+  }, 5000);
 }
 
+const setHoverBlack = (e) => {
+  e.target.style.backgroundColor = "rgba(0,0,0,0.5)";
+};
+
+const setHoverWhite = (e) => {
+  e.target.style.backgroundColor = "rgba(255,255,255,0.5)";
+};
+
+const setReturnClear = (e) => {
+  e.target.style.backgroundColor = "rgba(0,0,0,0)";
+};
+
+const setReturnWhite = (e) => {
+  e.target.style.backgroundColor = "rgb(255,255,255)";
+};
+
 function nextPrev(scrollPos, container, n) {
-  console.log(`ScrollPos: ${scrollPos}`);
-  console.log(`Moving slide to ${scrollPos + n * 800}`);
   if (scrollPos == 0 && n == -1) {
     container.scroll((scrollPos += 3200), 0);
   } else if (scrollPos >= 0 && scrollPos < 3200) {
@@ -121,6 +115,12 @@ function nextPrev(scrollPos, container, n) {
   } else if (scrollPos == 3200) {
     container.scroll((scrollPos -= 3200), 0);
   }
+
+  let selectedCircle = document.getElementById(
+    `${Math.floor(scrollPos / 800)}`
+  );
+  setCircles(selectedCircle);
+
   return scrollPos;
 }
 
@@ -140,4 +140,16 @@ function addHover(div, setHoverColor, setReturnColor) {
   div.addEventListener("mouseover", setHoverColor);
   div.addEventListener("mouseout", setReturnColor);
   return div;
+}
+
+function setCircles(selectedCircle) {
+  const circles = document.getElementsByClassName("circle");
+  for (let c = 0; c < circles.length; c++) {
+    circles[c].style.backgroundColor = "rgba(0,0,0,0.0)";
+    //circles[c].removeEventListener("mouseout", setReturnColor);
+    circles[c].removeEventListener("mouseout", setReturnWhite);
+    circles[c].addEventListener("mouseout", setReturnClear);
+  }
+  selectedCircle.style.backgroundColor = "#FFFFFF";
+  selectedCircle.addEventListener("mouseout", setReturnWhite);
 }
